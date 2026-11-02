@@ -1,0 +1,25 @@
+---
+title: "endf_script"
+format: pdf
+---
+```{r}
+library(pacman)
+p_load(tidyverse, openxlsx2, magrittr, readr, stringr, lobstr, vroom)
+read_endf  <- function(inputfile){
+  col_widths <- c(11,11,11,11,11,11)
+  k  <- read_fwf(inputfile, col_positions = fwf_widths(col_widths))
+  k  <- as_tibble(k)
+  k  <- k[-1:-2,]
+  p1 <- select(k, X1, X2)
+  p2 <- select(k, X3, X4)
+  p3 <- select(k, X5, X6)
+  names(p1) <- c("eV", "xs")
+  names(p2) <- c("eV", "xs")
+  names(p3) <- c("eV", "xs")
+  bind_rows(
+    p1, p2, p3
+  )
+}
+inputfiles <- list.files("Xsec", full.names = TRUE, pattern = "\\.endf$")
+lapply(inputfiles, read_endf)
+```
